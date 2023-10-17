@@ -24,6 +24,10 @@ To run this app, first, you will need to set up the database using Docker, for t
 $ docker compose up -d
 ```
 
+Then, setup the environment variables in .env (you have to create the file) based on the example in this repo.
+Database credentials are in the docker-compose file, and you can just put whatever you want as the jwt secrets.
+URL should be whatever url is your frontend hosted at (if you're using my frontend example then just put 'http://localhost:5173')
+
 Once the database is up, you can start the app by running one of the following:
 
 ```bash
