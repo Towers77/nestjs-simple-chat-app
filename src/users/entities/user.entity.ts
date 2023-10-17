@@ -9,11 +9,14 @@ export class User {
   @Column()
   username: string;
 
-  @Column({ unique: true, nullable: false, select: false })
+  @Column({ unique: true, nullable: false })
   email: string;
 
-  @Column({ nullable: false, select: false })
+  @Column({ nullable: false })
   password: string;
+
+  @Column({ nullable: true })
+  refreshToken: string;
 
   @OneToMany(() => Message, (message) => message.sent_by)
   sent_messages: Message;
