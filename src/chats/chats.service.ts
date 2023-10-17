@@ -4,6 +4,7 @@ import { MoreThan, Repository } from 'typeorm';
 import { Chat } from './entities/chat.entity';
 import { User } from 'src/users/entities/user.entity';
 import { CreateChatDto } from './dto/create-chat.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ChatsService {
@@ -11,17 +12,12 @@ export class ChatsService {
     @InjectRepository(Chat)
     private readonly chatRepository: Repository<Chat>,
 
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(createChatDto: CreateChatDto) {
-    const user1 = await this.userRepository.findOneBy({
-      id: createChatDto.user1_id,
-    });
-    const user2 = await this.userRepository.findOneBy({
-      id: createChatDto.user2_id,
-    });
+    const user1 = await this.usersService.findOneById(createChatDto.user1_id);
+    const user2 = await this.usersService.findOneById(createChatDto.user2_id);
 
     await this.chatRepository.save({ user1, user2 });
 
@@ -29,7 +25,7 @@ export class ChatsService {
   }
 
   async findAllByUser(id: number) {
-    const user = await this.userRepository.findBy({ id });
+    const user = await this.usersService.findOneById(id);
 
     return await this.chatRepository.find({
       where: [{ user1: user }, { user2: user, message_count: MoreThan(0) }],
