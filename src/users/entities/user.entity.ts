@@ -15,9 +15,6 @@ export class User {
   @Column({ nullable: false })
   password: string;
 
-  @Column({ nullable: true })
-  refreshToken: string;
-
   @OneToMany(() => Message, (message) => message.sent_by)
   sent_messages: Message;
 }

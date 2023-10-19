@@ -31,4 +31,11 @@ export class UsersService {
   async findOneById(id: number) {
     return await this.userRepository.findOneBy({ id });
   }
+
+  async getProfileById(id: number) {
+    return await this.userRepository.findOne({
+      select: ['username'],
+      where: { id },
+    });
+  }
 }

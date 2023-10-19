@@ -12,49 +12,40 @@ import { LoginDto } from './dto/login.dto';
 import { Response } from 'express';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AccessTokenGuard } from 'src/common/accessToken.guard';
-import { RefreshTokenGuard } from 'src/common/refreshToken.guard';
-
-interface AccessRequest extends Request {
-  user: {
-    sub: number;
-    refreshToken: string;
-  };
-}
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+  async register(@Body() createUserDto: CreateUserDto) {
+    await this.authService.register(createUserDto);
+
+    return { message: 'Registered succesfully' };
   }
 
   @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    return await this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const { token, id } = await this.authService.login(loginDto);
 
-    /*  response
-      .cookie('access-cookie', tokens.accessToken, {
-        httpOnly: true,
-        secure: false,
-        sameSite: 'lax',
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      })
-      .send({ status: 'ok' }); */
+    response.cookie('ac', token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    return { id };
   }
 
   @UseGuards(AccessTokenGuard)
   @Get('logout')
-  logout(@Req() req: AccessRequest) {
-    this.authService.logout(req.user['sub']);
-  }
+  logout(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie('ac');
 
-  @UseGuards(RefreshTokenGuard)
-  @Get('refresh')
-  refreshTokens(@Req() req: AccessRequest) {
-    const userId = req.user['sub'];
-    const refreshToken = req.user['refreshToken'];
-    return this.authService.refreshTokens(userId, refreshToken);
+    return { message: 'success' };
   }
 }
