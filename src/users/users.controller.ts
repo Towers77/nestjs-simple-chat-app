@@ -11,4 +11,10 @@ export class UsersController {
   profile(@Param('id') id: number) {
     return this.usersService.getProfileById(id);
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Get()
+  findAll() {
+    return this.usersService.findAll();
+  }
 }

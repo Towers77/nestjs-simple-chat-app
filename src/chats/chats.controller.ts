@@ -12,8 +12,8 @@ export class ChatsController {
     return this.chatsService.create(createChatDto);
   }
 
-  @Get(':id')
-  findAllByUser(@Param('id') id: number) {
-    return this.chatsService.findAllByUser(id);
+  @Get(':user_id')
+  findAllByUserId(@Param('user_id') user_id: number) {
+    return this.chatsService.findAllByUserId(user_id);
   }
 }

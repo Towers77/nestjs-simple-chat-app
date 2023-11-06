@@ -24,7 +24,7 @@ export class ChatsService {
     return { message: 'Chat created Succesfully' };
   }
 
-  async findAllByUser(id: number) {
+  async findAllByUserId(id: number) {
     const user = await this.usersService.findOneById(id);
 
     return await this.chatRepository.find({

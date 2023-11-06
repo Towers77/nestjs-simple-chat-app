@@ -24,6 +24,10 @@ export class UsersService {
     return await this.userRepository.update(id, updateUserDto);
   }
 
+  async findAll() {
+    return await this.userRepository.find();
+  }
+
   async findOneByEmail(email: string) {
     return await this.userRepository.findOneBy({ email });
   }
