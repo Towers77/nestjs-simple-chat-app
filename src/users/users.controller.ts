@@ -17,4 +17,10 @@ export class UsersController {
   findAll() {
     return this.usersService.findAll();
   }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('search/:username')
+  findByUsername(@Param('username') username: string) {
+    return this.usersService.findByUsername(username);
+  }
 }

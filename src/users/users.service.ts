@@ -38,8 +38,16 @@ export class UsersService {
 
   async getProfileById(id: number) {
     return await this.userRepository.findOne({
-      select: ['username'],
+      select: ['id', 'username'],
       where: { id },
     });
+  }
+
+  async findByUsername(username: string) {
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .select(['user.id', 'user.username'])
+      .where('user.username ILIKE :username', { username: `%${username}%` })
+      .getMany();
   }
 }
