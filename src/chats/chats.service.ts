@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
 import { Chat } from './entities/chat.entity';
@@ -19,9 +19,9 @@ export class ChatsService {
     const user1 = await this.usersService.findOneById(createChatDto.user1_id);
     const user2 = await this.usersService.findOneById(createChatDto.user2_id);
 
-    const chat = await this.chatRepository.find({ where: { user1, user2 } });
+    const chat = await this.chatRepository.findOneBy({ user1, user2 });
 
-    if (chat) return { message: 'Chat already exists' };
+    if (chat) throw new BadRequestException('Chat already exists');
 
     await this.chatRepository.save({ user1, user2 });
 
