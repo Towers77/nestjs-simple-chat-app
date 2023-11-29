@@ -1,34 +1,49 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  SubscribeMessage,
+  MessageBody,
+  WebSocketServer,
+  ConnectedSocket,
+} from '@nestjs/websockets';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway()
+@WebSocketGateway({ cors: { origin: [process.env.URL], credentials: true } })
 export class MessagesGateway {
+  @WebSocketServer()
+  server: Server;
+
   constructor(private readonly messagesService: MessagesService) {}
 
+  //@UseGuards(AccessTokenGuard)
   @SubscribeMessage('createMessage')
-  create(@MessageBody() createMessageDto: CreateMessageDto) {
-    return this.messagesService.create(createMessageDto);
+  async create(@MessageBody() createMessageDto: CreateMessageDto) {
+    this.server
+      .in(createMessageDto.sent_in.toString())
+      .emit(
+        'createMessage',
+        await this.messagesService.create(createMessageDto),
+      );
   }
 
-  @SubscribeMessage('findAllMessages')
-  findAll() {
-    return this.messagesService.findAll();
+  @SubscribeMessage('joinChat')
+  async joinChat(
+    @MessageBody() chatId: number,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.join(chatId.toString());
   }
 
-  @SubscribeMessage('findOneMessage')
-  findOne(@MessageBody() id: number) {
-    return this.messagesService.findOne(id);
-  }
-
-  @SubscribeMessage('updateMessage')
-  update(@MessageBody() updateMessageDto: UpdateMessageDto) {
-    return this.messagesService.update(updateMessageDto.id, updateMessageDto);
-  }
-
-  @SubscribeMessage('removeMessage')
-  remove(@MessageBody() id: number) {
-    return this.messagesService.remove(id);
+  //@UseGuards(AccessTokenGuard)
+  @SubscribeMessage('findMessagesFromOneChat')
+  async findFromOneChat(
+    @MessageBody() chatId: number,
+    @ConnectedSocket() client: Socket,
+  ) {
+    client.emit(
+      'findMessagesFromOneChat',
+      await this.messagesService.findAllFromChat(chatId),
+    );
   }
 }
