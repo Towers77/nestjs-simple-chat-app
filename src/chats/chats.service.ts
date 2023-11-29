@@ -44,4 +44,17 @@ export class ChatsService {
       where: [{ user1: user }, { user2: user, message_count: MoreThan(0) }],
     });
   }
+
+  async findOneById(id: number) {
+    return await this.chatRepository.findOneBy({ id });
+  }
+
+  async updateMessageCount(id: number) {
+    const chat = await this.chatRepository.findOneBy({ id });
+
+    await this.chatRepository.update(
+      { id },
+      { message_count: chat.message_count + 1 },
+    );
+  }
 }
