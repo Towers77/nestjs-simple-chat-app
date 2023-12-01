@@ -41,6 +41,9 @@ export class MessagesService {
         id: sent_by.id,
         username: sent_by.username,
       },
+      sent_in: {
+        id: sent_in.id,
+      },
     };
     return response;
   }
@@ -55,6 +58,7 @@ export class MessagesService {
         created_at: true,
         text: true,
         sent_by: { id: true, username: true },
+        sent_in: { id: true },
       },
       where: { sent_in: chat },
     });
