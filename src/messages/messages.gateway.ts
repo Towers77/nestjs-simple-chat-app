@@ -18,13 +18,15 @@ export class MessagesGateway {
 
   //@UseGuards(AccessTokenGuard)
   @SubscribeMessage('createMessage')
-  async create(@MessageBody() createMessageDto: CreateMessageDto) {
+  async create(
+    @MessageBody() createMessageDto: CreateMessageDto,
+    @ConnectedSocket() client: Socket,
+  ) {
+    const message = await this.messagesService.create(createMessageDto);
+
     this.server
       .in(createMessageDto.sent_in.toString())
-      .emit(
-        'createMessage',
-        await this.messagesService.create(createMessageDto),
-      );
+      .emit('createMessage', message);
   }
 
   @SubscribeMessage('joinChat')
